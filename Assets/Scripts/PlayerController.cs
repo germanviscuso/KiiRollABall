@@ -9,11 +9,20 @@ public class PlayerController : MonoBehaviour {
 	public float verticalBoost;
 	public GUIText countText;
 	public GUIText winText;
+	public CNJoystick joystick;
 	private int count;
 	private float gameTime;
 	private KiiUser user = null;
 	public static string appScopeScoreBucket = "global_scores";
 	private bool scoreSent = false;
+
+	void Awake()
+	{
+		joystick.JoystickMovedEvent += JoystickMovedEventHandler;
+		if (Application.platform != RuntimePlatform.Android || Application.platform != RuntimePlatform.IPhonePlayer || Application.platform != RuntimePlatform.WP8Player || Application.platform != RuntimePlatform.TizenPlayer) {
+			joystick.CurrentCamera.enabled = false;
+		}
+	}
 
 	void Start(){
 		count = 0;
@@ -40,6 +49,30 @@ public class PlayerController : MonoBehaviour {
 			other.gameObject.SetActive(false);
 			count++;
 		}
+	}
+
+	private void JoystickMovedEventHandler(Vector3 dragVector)
+	{
+		float moveHorizontal = dragVector.x;
+		float moveVertical = dragVector.y;
+		float jump = Input.GetKey("space") ? verticalBoost : 0.0f;
+		
+		Vector3 movement = new Vector3(moveHorizontal, jump, moveVertical);
+		
+		rigidbody.AddForce(movement * speed * Time.deltaTime);
+		//Debug.Log ("x:"+dragVector.x+" y:"+dragVector.y+" z:"+dragVector.z);
+		/*dragVector.z = dragVector.y;
+		dragVector.y = 0f;
+		Vector3 movement = mainCamera.transform.TransformDirection(dragVector);
+		movement.y = 0f;
+		// Uncomment this line if you want to normalize speed,
+		// to keep the speed at a constant value
+		// -- UNCOMMENT THIS ---
+		// movement.Normalize();
+		// ---------------------
+		totalMove.x = movement.x * runSpeed;
+		totalMove.z = movement.z * runSpeed;
+		FaceMovementDirection(movement);*/
 	}
 
 	void OnGUI () {
@@ -93,4 +126,5 @@ public class PlayerController : MonoBehaviour {
 			username = user.Username + " ";
 		countText.text = username + count.ToString() + "/27 " + gameTime.ToString("n2");
 	}
+	
 }
