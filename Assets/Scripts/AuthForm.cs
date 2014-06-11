@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KiiCorp.Cloud.Storage;
-using KiiCorp.Cloud.Unity;
 using System;
 
 public class AuthForm : MonoBehaviour {
@@ -13,6 +12,7 @@ public class AuthForm : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		//Config below is obsolete, itś ow done via attaching KiiInitializeBehavior to a game object
 		//KiiInitializeBehaviour.Instantiate();
 		//Kii.InitializeBehaviour ("3f82ae6d", "23bc26efeaf4c9d2606c355f6441d435", Kii.Site.US);
 		//KiiAnalytics.Initialize("your_app_id", "your_app_key", KiiAnalytics.Site.your_server_location, "unique_device_id");

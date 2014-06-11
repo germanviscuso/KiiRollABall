@@ -2,6 +2,7 @@
 using System.Collections;
 using KiiCorp.Cloud.Storage;
 using System;
+using KiiCorp.Cloud.Unity;
 
 public class PlayerController : MonoBehaviour {
 
@@ -28,6 +29,33 @@ public class PlayerController : MonoBehaviour {
 		count = 0;
 		if(Kii.AppId != null)
 			user = KiiUser.CurrentUser;
+
+		//Set up push listeners
+		KiiPushPlugin kiiPushPlugin = GameObject.Find ("KiiPushPlugin").GetComponent<KiiPushPlugin> ();
+		Debug.Log ("Found KiiPushPlugin object in game objects");
+		kiiPushPlugin.OnPushMessageReceived += (ReceivedMessage message) => {
+			// This event handler is called when received the push message.
+			switch (message.PushMessageType)
+			{
+			case ReceivedMessage.MessageType.PUSH_TO_APP:
+				Debug.Log ("#####PUSH_TO_APP Message");
+				Application.OpenURL("http://developer.kii.com");
+				break;
+			case ReceivedMessage.MessageType.PUSH_TO_USER:
+				Debug.Log ("#####PUSH_TO_USER Message");
+				Application.OpenURL("http://developer.kii.com");
+				break;
+			case ReceivedMessage.MessageType.DIRECT_PUSH:
+				Debug.Log ("#####DIRECT_PUSH Message");
+				Application.OpenURL("http://developer.kii.com");
+				break;
+			}
+			Debug.Log("Type=" + message.PushMessageType);
+			Debug.Log("Sender=" + message.Sender);
+			Debug.Log("Scope=" + message.ObjectScope);
+			// You can get the value of custom field using GetXXXX method.
+			Debug.Log("Payload=" + message.GetString("payload"));
+		};
 	}
 
 	void Update(){
