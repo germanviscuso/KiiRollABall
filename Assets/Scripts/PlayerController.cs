@@ -39,15 +39,19 @@ public class PlayerController : MonoBehaviour {
 			{
 			case ReceivedMessage.MessageType.PUSH_TO_APP:
 				Debug.Log ("#####PUSH_TO_APP Message");
-				Application.OpenURL("http://developer.kii.com");
+				// do something to notify your app of the incomig message
 				break;
 			case ReceivedMessage.MessageType.PUSH_TO_USER:
 				Debug.Log ("#####PUSH_TO_USER Message");
-				Application.OpenURL("http://developer.kii.com");
+				// your user received a message, do something
 				break;
 			case ReceivedMessage.MessageType.DIRECT_PUSH:
 				Debug.Log ("#####DIRECT_PUSH Message");
-				Application.OpenURL("http://developer.kii.com");
+				// A direct push message was sent from developer.kii.com
+				// Let's grab the url value of the message and open that page
+				string url = message.GetString("url");
+				Debug.Log ("Url in message is: " + url);
+				Application.OpenURL("http://" + url);
 				break;
 			}
 			Debug.Log("Type=" + message.PushMessageType);
@@ -56,6 +60,30 @@ public class PlayerController : MonoBehaviour {
 			// You can get the value of custom field using GetXXXX method.
 			Debug.Log("Payload=" + message.GetString("payload"));
 		};
+
+		#if UNITY_IPHONE
+		KiiPushInstallation.DeviceType deviceType = KiiPushInstallation.DeviceType.IOS;
+		#elif UNITY_ANDROID
+		KiiPushInstallation.DeviceType deviceType = KiiPushInstallation.DeviceType.ANDROID;
+		#else
+		KiiPushInstallation.DeviceType deviceType = KiiPushInstallation.DeviceType.ANDROID;
+		#endif
+
+		kiiPushPlugin.RegisterPush((string pushToken, Exception e0)=> {
+			if (e0 != null) {
+				Debug.Log("#####failed to RegisterPush");
+				return;
+			}
+			Debug.Log ("#####RegistrationId=" + pushToken);
+			Debug.Log ("#####Install");
+			KiiUser.PushInstallation (true).Install (pushToken, deviceType, (Exception e3)=>{
+				if (e3 != null)
+				{
+					Debug.Log ("#####failed to Install");
+					return;
+				}
+			});
+		});
 	}
 
 	void Update(){
@@ -154,5 +182,4 @@ public class PlayerController : MonoBehaviour {
 			username = user.Username + " ";
 		countText.text = username + count.ToString() + "/27 " + gameTime.ToString("n2");
 	}
-	
 }
